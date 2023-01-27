@@ -186,10 +186,10 @@ def master_local_bytes_plugs():
                         HOSTS_DB["LocalBytes_plugs"][each]["last_power_time"] = time_slot
                         power_rate = difference_in_power / (int(difference_in_time) / 3600)
                         HOSTS_DB["LocalBytes_plugs"][each]["last_power"] = out10_json["StatusSNS"]["ENERGY"]["Total"]
-                except requests.exceptions.ConnectionError:
-                    function_logger.error("ConnectionError connecting to %s" % each)
-                except requests.exceptions.Timeout:
-                    function_logger.error("Timeout connecting to %s" % each)
+                except requests.exceptions.ConnectionError as e:
+                    function_logger.error("ConnectionError %s connecting to %s" % (e, each))
+                except requests.exceptions.Timeout as e:
+                    function_logger.error("Timeout %s connecting to %s" % (e, each))
                 except Exception as e:
                     function_logger.error("something went bad connecting to %s" % each)
                     function_logger.error("Unexpected error:%s" % str(sys.exc_info()[0]))
