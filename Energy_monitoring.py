@@ -126,7 +126,7 @@ def update_influx(raw_string, timestamp=None):
 def master_local_bytes_plugs():
     function_logger = logger.getChild("%s.%s.%s" % (inspect.stack()[2][3], inspect.stack()[1][3], inspect.stack()[0][3]))
     function_logger.info("local_bytes_plugs_thread")
-    function_logger.setLevel(logging.INFO)
+    function_logger.setLevel(logging.DEBUG)
     historical_upload = ""
     if HOSTS_DB.get("LocalBytes_plugs"):
         while not THREAD_TO_BREAK.is_set():
