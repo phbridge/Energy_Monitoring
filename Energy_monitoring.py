@@ -126,107 +126,110 @@ def update_influx(raw_string, timestamp=None):
 def master_local_bytes_plugs():
     function_logger = logger.getChild("%s.%s.%s" % (inspect.stack()[2][3], inspect.stack()[1][3], inspect.stack()[0][3]))
     function_logger.info("local_bytes_plugs_thread")
+    function_logger.setLevel(logging.INFO)
     historical_upload = ""
-    while not THREAD_TO_BREAK.is_set():
-        now = datetime.now()
-        timestamp_string = str(int(now.timestamp()) * 1000000000)
-        future = now + timedelta(seconds=30)
-        influx_upload = ""
-        if HOSTS_DB.get("LocalBytes_plugs"):
+    if HOSTS_DB.get("LocalBytes_plugs"):
+        while not THREAD_TO_BREAK.is_set():
+            now = datetime.now()
+            timestamp_string = str(int(now.timestamp()) * 1000000000)
+            future = now + timedelta(seconds=30)
+            influx_upload = ""
             for each in HOSTS_DB["LocalBytes_plugs"]:
-                url_9 = "http://%s/cm?cmnd=Status+9&user=%s&password=%s" % (HOSTS_DB["LocalBytes_plugs"][each]["address"], HOSTS_DB["LocalBytes_plugs"][each]["username"], HOSTS_DB["LocalBytes_plugs"][each]["password"])
-                url_10 = "http://%s/cm?cmnd=Status+10&user=%s&password=%s" % (HOSTS_DB["LocalBytes_plugs"][each]["address"], HOSTS_DB["LocalBytes_plugs"][each]["username"], HOSTS_DB["LocalBytes_plugs"][each]["password"])
-                PowerLow = 0
-                PowerHigh = 0
-                VoltageLow = 0
-                VoltageHigh = 0
-                CurrentLow = 0
-                CurrentHigh = 0
-                Power = 0
-                ApparentPower = 0
-                ReactivePower = 0
-                Factor = 0
-                Voltage = 0
-                Current = 0
-                power_rate = 0
-                time_slot = datetime.now()
-                function_logger.debug(url_9)
-                function_logger.debug(url_10)
-                try:
-                    output_9 = requests.get(url=url_9)
-                    output_10 = requests.get(url=url_10)
-                    function_logger.debug(output_9.status_code)
-                    function_logger.debug(output_10.status_code)
-                    function_logger.debug(output_9.json())
-                    function_logger.debug(output_10.json())
+                    url_9 = "http://%s/cm?cmnd=Status+9&user=%s&password=%s" % (HOSTS_DB["LocalBytes_plugs"][each]["address"], HOSTS_DB["LocalBytes_plugs"][each]["username"], HOSTS_DB["LocalBytes_plugs"][each]["password"])
+                    url_10 = "http://%s/cm?cmnd=Status+10&user=%s&password=%s" % (HOSTS_DB["LocalBytes_plugs"][each]["address"], HOSTS_DB["LocalBytes_plugs"][each]["username"], HOSTS_DB["LocalBytes_plugs"][each]["password"])
+                    PowerLow = 0
+                    PowerHigh = 0
+                    VoltageLow = 0
+                    VoltageHigh = 0
+                    CurrentLow = 0
+                    CurrentHigh = 0
+                    Power = 0
+                    ApparentPower = 0
+                    ReactivePower = 0
+                    Factor = 0
+                    Voltage = 0
+                    Current = 0
+                    power_rate = 0
+                    time_slot = datetime.now()
+                    function_logger.debug(url_9)
+                    function_logger.debug(url_10)
+                    try:
+                        output_9 = requests.get(url=url_9)
+                        output_10 = requests.get(url=url_10)
+                        function_logger.debug(output_9.status_code)
+                        function_logger.debug(output_10.status_code)
+                        function_logger.debug(output_9.json())
+                        function_logger.debug(output_10.json())
 
-                    if output_9.status_code == 200:
-                        out9_json = output_9.json()
-                        PowerLow = out9_json["StatusPTH"]["PowerLow"]
-                        PowerHigh = out9_json["StatusPTH"]["PowerHigh"]
-                        VoltageLow = out9_json["StatusPTH"]["VoltageLow"]
-                        VoltageHigh = out9_json["StatusPTH"]["VoltageHigh"]
-                        CurrentLow = out9_json["StatusPTH"]["CurrentLow"]
-                        CurrentHigh = out9_json["StatusPTH"]["CurrentHigh"]
-                    if output_10.status_code == 200:
-                        out10_json = output_10.json()
-                        Total = out10_json["StatusSNS"]["ENERGY"]["Total"]
-                        Power = out10_json["StatusSNS"]["ENERGY"]["Power"]
-                        ApparentPower = out10_json["StatusSNS"]["ENERGY"]["ApparentPower"]
-                        ReactivePower = out10_json["StatusSNS"]["ENERGY"]["ReactivePower"]
-                        Factor = out10_json["StatusSNS"]["ENERGY"]["Factor"]
-                        Voltage = out10_json["StatusSNS"]["ENERGY"]["Voltage"]
-                        Current = out10_json["StatusSNS"]["ENERGY"]["Current"]
-                        if not HOSTS_DB["LocalBytes_plugs"][each].get("last_power"):
-                            HOSTS_DB["LocalBytes_plugs"][each]["last_power"] = out10_json["StatusSNS"]["ENERGY"]["Total"]
-                        difference_in_power = out10_json["StatusSNS"]["ENERGY"]["Total"] - HOSTS_DB["LocalBytes_plugs"][each]["last_power"]
-                        if not HOSTS_DB["LocalBytes_plugs"][each].get("last_power_time"):
+                        if output_9.status_code == 200:
+                            out9_json = output_9.json()
+                            PowerLow = out9_json["StatusPTH"]["PowerLow"]
+                            PowerHigh = out9_json["StatusPTH"]["PowerHigh"]
+                            VoltageLow = out9_json["StatusPTH"]["VoltageLow"]
+                            VoltageHigh = out9_json["StatusPTH"]["VoltageHigh"]
+                            CurrentLow = out9_json["StatusPTH"]["CurrentLow"]
+                            CurrentHigh = out9_json["StatusPTH"]["CurrentHigh"]
+                        if output_10.status_code == 200:
+                            out10_json = output_10.json()
+                            Total = out10_json["StatusSNS"]["ENERGY"]["Total"]
+                            Power = out10_json["StatusSNS"]["ENERGY"]["Power"]
+                            ApparentPower = out10_json["StatusSNS"]["ENERGY"]["ApparentPower"]
+                            ReactivePower = out10_json["StatusSNS"]["ENERGY"]["ReactivePower"]
+                            Factor = out10_json["StatusSNS"]["ENERGY"]["Factor"]
+                            Voltage = out10_json["StatusSNS"]["ENERGY"]["Voltage"]
+                            Current = out10_json["StatusSNS"]["ENERGY"]["Current"]
+                            if not HOSTS_DB["LocalBytes_plugs"][each].get("last_power"):
+                                HOSTS_DB["LocalBytes_plugs"][each]["last_power"] = out10_json["StatusSNS"]["ENERGY"]["Total"]
+                            difference_in_power = out10_json["StatusSNS"]["ENERGY"]["Total"] - HOSTS_DB["LocalBytes_plugs"][each]["last_power"]
+                            if not HOSTS_DB["LocalBytes_plugs"][each].get("last_power_time"):
+                                HOSTS_DB["LocalBytes_plugs"][each]["last_power_time"] = time_slot
+                            difference_in_time = (time_slot - HOSTS_DB["LocalBytes_plugs"][each]["last_power_time"]).seconds
                             HOSTS_DB["LocalBytes_plugs"][each]["last_power_time"] = time_slot
-                        difference_in_time = (time_slot - HOSTS_DB["LocalBytes_plugs"][each]["last_power_time"]).seconds
-                        HOSTS_DB["LocalBytes_plugs"][each]["last_power_time"] = time_slot
-                        power_rate = difference_in_power / (int(difference_in_time) / 3600)
-                        HOSTS_DB["LocalBytes_plugs"][each]["last_power"] = out10_json["StatusSNS"]["ENERGY"]["Total"]
-                except requests.exceptions.ConnectionError as e:
-                    function_logger.error("ConnectionError %s connecting to %s" % (e, each))
-                except requests.exceptions.Timeout as e:
-                    function_logger.error("Timeout %s connecting to %s" % (e, each))
-                except Exception as e:
-                    function_logger.error("something went bad connecting to %s" % each)
-                    function_logger.error("Unexpected error:%s" % str(sys.exc_info()[0]))
-                    function_logger.error("Unexpected error:%s" % str(e))
-                    function_logger.error("TRACEBACK=%s" % str(traceback.format_exc()))
-                # cost = Power * PRICE_KWH
-                cost = power_rate * PRICE_KWH
+                            power_rate = difference_in_power / (int(difference_in_time) / 3600)
+                            HOSTS_DB["LocalBytes_plugs"][each]["last_power"] = out10_json["StatusSNS"]["ENERGY"]["Total"]
+                    except requests.exceptions.ConnectionError as e:
+                        function_logger.error("ConnectionError %s connecting to %s" % (e, each))
+                    except requests.exceptions.Timeout as e:
+                        function_logger.error("Timeout %s connecting to %s" % (e, each))
+                    except Exception as e:
+                        function_logger.error("something went bad connecting to %s" % each)
+                        function_logger.error("Unexpected error:%s" % str(sys.exc_info()[0]))
+                        function_logger.error("Unexpected error:%s" % str(e))
+                        function_logger.error("TRACEBACK=%s" % str(traceback.format_exc()))
+                    # cost = Power * PRICE_KWH
+                    cost = power_rate * PRICE_KWH
 
-                influx_upload += "LocalBytes_plugs,plug_name=%s " \
-                                 "PowerLow=%s,PowerHigh=%s,VoltageLow=%s,VoltageHigh=%s,CurrentLow=%s,CurrentHigh=%s," \
-                                 "Power=%s,ApparentPower=%s,ReactivePower=%s,Factor=%s,Voltage=%s,Current=%s," \
-                                 "cost=%s,power_rate=%s \n" % \
-                                 (each,
-                                  PowerLow, PowerHigh, VoltageLow, VoltageHigh, CurrentLow, CurrentHigh,
-                                  Power, ApparentPower, ReactivePower, Factor, Voltage, Current,
-                                  cost, power_rate)
+                    influx_upload += "LocalBytes_plugs,plug_name=%s " \
+                                     "PowerLow=%s,PowerHigh=%s,VoltageLow=%s,VoltageHigh=%s,CurrentLow=%s,CurrentHigh=%s," \
+                                     "Power=%s,ApparentPower=%s,ReactivePower=%s,Factor=%s,Voltage=%s,Current=%s," \
+                                     "cost=%s,power_rate=%s \n" % \
+                                     (each,
+                                      PowerLow, PowerHigh, VoltageLow, VoltageHigh, CurrentLow, CurrentHigh,
+                                      Power, ApparentPower, ReactivePower, Factor, Voltage, Current,
+                                      cost, power_rate)
+            to_send = ""
+            for each in influx_upload.splitlines():
+                to_send += each + " " + timestamp_string + "\n"
+            if not historical_upload == "":
+                function_logger.debug("adding history to upload")
+                to_send += historical_upload
+            if update_influx(to_send):
+                historical_upload = ""
+            else:
+                max_lines = 100
+                line_number = 0
+                historical_upload = ""
+                for line in to_send.splitlines():
+                    if line_number < max_lines:
+                        historical_upload += line + "\n"
+                        line_number += 1
+            print(influx_upload)
+            time_to_sleep = (future - datetime.now()).seconds
+            if 30 > time_to_sleep > 0:
+                THREAD_TO_BREAK.wait(time_to_sleep)
+    else:
+        return
 
-        to_send = ""
-        for each in influx_upload.splitlines():
-            to_send += each + " " + timestamp_string + "\n"
-        if not historical_upload == "":
-            function_logger.debug("adding history to upload")
-            to_send += historical_upload
-        if update_influx(to_send):
-            historical_upload = ""
-        else:
-            max_lines = 100
-            line_number = 0
-            historical_upload = ""
-            for line in to_send.splitlines():
-                if line_number < max_lines:
-                    historical_upload += line + "\n"
-                    line_number += 1
-        print(influx_upload)
-        time_to_sleep = (future - datetime.now()).seconds
-        if 30 > time_to_sleep > 0:
-            THREAD_TO_BREAK.wait(time_to_sleep)
 
 
 def graceful_killer(signal_number, frame):
