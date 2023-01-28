@@ -223,7 +223,7 @@ def master_local_bytes_plugs():
                     if line_number < max_lines:
                         historical_upload += line + "\n"
                         line_number += 1
-            print(influx_upload)
+            # print(influx_upload)
             time_to_sleep = (future - datetime.now()).seconds
             if 30 > time_to_sleep > 0:
                 THREAD_TO_BREAK.wait(time_to_sleep)
