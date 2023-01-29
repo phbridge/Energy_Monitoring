@@ -154,8 +154,8 @@ def master_local_bytes_plugs():
                     function_logger.debug(url_9)
                     function_logger.debug(url_10)
                     try:
-                        output_9 = requests.get(url=url_9)
-                        output_10 = requests.get(url=url_10)
+                        output_9 = requests.get(url=url_9, timeout=(4, 2))
+                        output_10 = requests.get(url=url_10, timeout=(4, 2))
                         function_logger.debug(output_9.status_code)
                         function_logger.debug(output_10.status_code)
                         function_logger.debug(output_9.json())
