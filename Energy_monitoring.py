@@ -153,6 +153,7 @@ def master_local_bytes_plugs():
                     time_slot = datetime.now()
                     function_logger.debug(url_9)
                     function_logger.debug(url_10)
+                    upload = True
                     try:
                         output_9 = requests.get(url=url_9, timeout=(4, 2))
                         output_10 = requests.get(url=url_10, timeout=(4, 2))
@@ -169,6 +170,8 @@ def master_local_bytes_plugs():
                             VoltageHigh = out9_json["StatusPTH"]["VoltageHigh"]
                             CurrentLow = out9_json["StatusPTH"]["CurrentLow"]
                             CurrentHigh = out9_json["StatusPTH"]["CurrentHigh"]
+                        else:
+                            upload = False
                         if output_10.status_code == 200:
                             out10_json = output_10.json()
                             Total = out10_json["StatusSNS"]["ENERGY"]["Total"]
@@ -185,8 +188,13 @@ def master_local_bytes_plugs():
                                 HOSTS_DB["LocalBytes_plugs"][each]["last_power_time"] = time_slot
                             difference_in_time = (time_slot - HOSTS_DB["LocalBytes_plugs"][each]["last_power_time"]).seconds
                             HOSTS_DB["LocalBytes_plugs"][each]["last_power_time"] = time_slot
-                            power_rate = difference_in_power / (int(difference_in_time) / 3600)
+                            if difference_in_time > 0:
+                                power_rate = difference_in_power / (int(difference_in_time) / 3600)
+                            else:
+                                power_rate = 0
                             HOSTS_DB["LocalBytes_plugs"][each]["last_power"] = out10_json["StatusSNS"]["ENERGY"]["Total"]
+                        else:
+                            upload = False
                     except requests.exceptions.ConnectionError as e:
                         function_logger.error("ConnectionError %s connecting to %s" % (e, each))
                     except requests.exceptions.Timeout as e:
@@ -197,16 +205,17 @@ def master_local_bytes_plugs():
                         function_logger.error("Unexpected error:%s" % str(e))
                         function_logger.error("TRACEBACK=%s" % str(traceback.format_exc()))
                     # cost = Power * PRICE_KWH
-                    cost = power_rate * PRICE_KWH
+                    if upload:
+                        cost = power_rate * PRICE_KWH
 
-                    influx_upload += "LocalBytes_plugs,plug_name=%s " \
-                                     "PowerLow=%s,PowerHigh=%s,VoltageLow=%s,VoltageHigh=%s,CurrentLow=%s,CurrentHigh=%s," \
-                                     "Power=%s,ApparentPower=%s,ReactivePower=%s,Factor=%s,Voltage=%s,Current=%s," \
-                                     "cost=%s,power_rate=%s \n" % \
-                                     (each,
-                                      PowerLow, PowerHigh, VoltageLow, VoltageHigh, CurrentLow, CurrentHigh,
-                                      Power, ApparentPower, ReactivePower, Factor, Voltage, Current,
-                                      cost, power_rate)
+                        influx_upload += "LocalBytes_plugs,plug_name=%s " \
+                                         "PowerLow=%s,PowerHigh=%s,VoltageLow=%s,VoltageHigh=%s,CurrentLow=%s,CurrentHigh=%s," \
+                                         "Power=%s,ApparentPower=%s,ReactivePower=%s,Factor=%s,Voltage=%s,Current=%s," \
+                                         "cost=%s,power_rate=%s \n" % \
+                                         (each,
+                                          PowerLow, PowerHigh, VoltageLow, VoltageHigh, CurrentLow, CurrentHigh,
+                                          Power, ApparentPower, ReactivePower, Factor, Voltage, Current,
+                                          cost, power_rate)
             to_send = ""
             for each in influx_upload.splitlines():
                 to_send += each + " " + timestamp_string + "\n"
