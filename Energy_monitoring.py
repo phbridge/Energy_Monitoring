@@ -172,6 +172,7 @@ def master_local_bytes_plugs():
                             CurrentHigh = out9_json["StatusPTH"]["CurrentHigh"]
                         else:
                             upload = False
+                            function_logger.error("output 9 status code !200 was %s" % output_9.status_code)
                         if output_10.status_code == 200:
                             out10_json = output_10.json()
                             Total = out10_json["StatusSNS"]["ENERGY"]["Total"]
@@ -195,10 +196,13 @@ def master_local_bytes_plugs():
                             HOSTS_DB["LocalBytes_plugs"][each]["last_power"] = out10_json["StatusSNS"]["ENERGY"]["Total"]
                         else:
                             upload = False
+                            function_logger.error("output 10 status code !200 was %s" % output_10.status_code)
                     except requests.exceptions.ConnectionError as e:
                         function_logger.error("ConnectionError %s connecting to %s" % (e, each))
+                        upload = False
                     except requests.exceptions.Timeout as e:
                         function_logger.error("Timeout %s connecting to %s" % (e, each))
+                        upload = False
                     except Exception as e:
                         function_logger.error("something went bad connecting to %s" % each)
                         function_logger.error("Unexpected error:%s" % str(sys.exc_info()[0]))
