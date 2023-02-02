@@ -204,6 +204,7 @@ def master_local_bytes_plugs():
                             function_logger.error("output 10 status code !200 was %s" % output_10.status_code)
                         if output_11.status_code == 200:
                             out11_json = output_11.json()
+                            function_logger.info(out11_json)
                             UptimeSec = out11_json["StatusSTS"]["UptimeSec"]
                         else:
                             upload = False
