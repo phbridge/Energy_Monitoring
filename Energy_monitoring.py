@@ -137,6 +137,9 @@ def master_local_bytes_plugs():
             for each in HOSTS_DB["LocalBytes_plugs"]:
                     url_9 = "http://%s/cm?cmnd=Status+9&user=%s&password=%s" % (HOSTS_DB["LocalBytes_plugs"][each]["address"], HOSTS_DB["LocalBytes_plugs"][each]["username"], HOSTS_DB["LocalBytes_plugs"][each]["password"])
                     url_10 = "http://%s/cm?cmnd=Status+10&user=%s&password=%s" % (HOSTS_DB["LocalBytes_plugs"][each]["address"], HOSTS_DB["LocalBytes_plugs"][each]["username"], HOSTS_DB["LocalBytes_plugs"][each]["password"])
+                    # adding url 11 to track uptime during testing
+                    url_11 = "http://%s/cm?cmnd=Status+11&user=%s&password=%s" % (HOSTS_DB["LocalBytes_plugs"][each]["address"], HOSTS_DB["LocalBytes_plugs"][each]["username"], HOSTS_DB["LocalBytes_plugs"][each]["password"])
+                    UptimeSec = 0
                     PowerLow = 0
                     PowerHigh = 0
                     VoltageLow = 0
@@ -157,6 +160,8 @@ def master_local_bytes_plugs():
                     try:
                         output_9 = requests.get(url=url_9, timeout=(4, 2))
                         output_10 = requests.get(url=url_10, timeout=(4, 2))
+                        # testing phases only
+                        output_11 = requests.get(url=url_10, timeout=(4, 2))
                         function_logger.debug(output_9.status_code)
                         function_logger.debug(output_10.status_code)
                         function_logger.debug(output_9.json())
@@ -197,6 +202,12 @@ def master_local_bytes_plugs():
                         else:
                             upload = False
                             function_logger.error("output 10 status code !200 was %s" % output_10.status_code)
+                        if output_11.status_code == 200:
+                            out11_json = output_11.json()
+                            UptimeSec = out11_json["StatusSTS"]["UptimeSec"]
+                        else:
+                            upload = False
+                            function_logger.error("output 11 status code !200 was %s" % output_11.status_code)
                     except requests.exceptions.ConnectionError as e:
                         function_logger.error("ConnectionError %s connecting to %s" % (e, each))
                         upload = False
@@ -215,11 +226,11 @@ def master_local_bytes_plugs():
                         influx_upload += "LocalBytes_plugs,plug_name=%s " \
                                          "PowerLow=%s,PowerHigh=%s,VoltageLow=%s,VoltageHigh=%s,CurrentLow=%s,CurrentHigh=%s," \
                                          "Power=%s,ApparentPower=%s,ReactivePower=%s,Factor=%s,Voltage=%s,Current=%s," \
-                                         "cost=%s,power_rate=%s \n" % \
+                                         "cost=%s,power_rate=%s,uptimesec=%s \n" % \
                                          (each,
                                           PowerLow, PowerHigh, VoltageLow, VoltageHigh, CurrentLow, CurrentHigh,
                                           Power, ApparentPower, ReactivePower, Factor, Voltage, Current,
-                                          cost, power_rate)
+                                          cost, power_rate, UptimeSec)
             to_send = ""
             for each in influx_upload.splitlines():
                 to_send += each + " " + timestamp_string + "\n"
