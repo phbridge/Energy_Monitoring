@@ -118,7 +118,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     function_logger = logger.getChild("%s.%s.%s" % (inspect.stack()[2][3], inspect.stack()[1][3], inspect.stack()[0][3]))
-    print(msg.topic + " " + str(msg.payload))
+    # print(msg.topic + " " + str(msg.payload))
     # print(msg.topic + " " + str(bytes(msg.payload)))
     topic_tree = str(msg.topic).split("/")
     time_slot = datetime.now()
@@ -186,7 +186,7 @@ def on_message(client, userdata, msg):
         elif message_type == "SENSOR":
             SENSOR_json = json.loads(message)
             # function_logger.info(out11_json)
-            Total = SENSOR_json["StatusSNS"]["Total"]
+            Total = SENSOR_json["ENERGY"]["Total"]
             Power = SENSOR_json["ENERGY"]["Power"]
             ApparentPower = SENSOR_json["ENERGY"]["ApparentPower"]
             ReactivePower = SENSOR_json["ENERGY"]["ReactivePower"]
