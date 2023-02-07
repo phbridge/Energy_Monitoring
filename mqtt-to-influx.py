@@ -174,12 +174,53 @@ def on_message(client, userdata, msg):
                              "uptimesec=%s,Heap=%s \n" % \
                              (plugname, UptimeSec, Heap)
             return influx_upload
+        elif message_type == "STATE":
+            STATE_json = json.loads(message)
+            # function_logger.info(out11_json)
+            UptimeSec = STATE_json["UptimeSec"]
+            Heap = STATE_json["Heap"]
+            influx_upload = "LocalBytes_plugs,plug_name=%s " \
+                            "uptimesec=%s,Heap=%s \n" % \
+                            (plugname, UptimeSec, Heap)
+            return influx_upload
+        elif message_type == "SENSOR":
+            SENSOR_json = json.loads(message)
+            # function_logger.info(out11_json)
+            Total = SENSOR_json["StatusSNS"]["Total"]
+            Power = SENSOR_json["ENERGY"]["Power"]
+            ApparentPower = SENSOR_json["ENERGY"]["ApparentPower"]
+            ReactivePower = SENSOR_json["ENERGY"]["ReactivePower"]
+            Factor = SENSOR_json["ENERGY"]["Factor"]
+            Voltage = SENSOR_json["ENERGY"]["Voltage"]
+            Current = SENSOR_json["ENERGY"]["Current"]
+            ReactivePower = SENSOR_json["ENERGY"]["ReactivePower"]
+            if not HOSTS_DB["LocalBytes_plugs"][plugname].get("last_power"):
+                HOSTS_DB["LocalBytes_plugs"][plugname]["last_power"] = SENSOR_json["ENERGY"]["Total"]
+            difference_in_power = SENSOR_json["ENERGY"]["Total"] - HOSTS_DB["LocalBytes_plugs"][plugname][
+                "last_power"]
+            if not HOSTS_DB["LocalBytes_plugs"][plugname].get("last_power_time"):
+                HOSTS_DB["LocalBytes_plugs"][plugname]["last_power_time"] = time_slot
+            difference_in_time = (time_slot - HOSTS_DB["LocalBytes_plugs"][plugname]["last_power_time"]).seconds
+            HOSTS_DB["LocalBytes_plugs"][plugname]["last_power_time"] = time_slot
+            if difference_in_time > 0:
+                power_rate = difference_in_power / (int(difference_in_time) / 3600)
+            else:
+                power_rate = 0
+            HOSTS_DB["LocalBytes_plugs"][plugname]["last_power"] = SENSOR_json["ENERGY"]["Total"]
+
+            cost = power_rate * PRICE_KWH
+
+            influx_upload = "LocalBytes_plugs,plug_name=%s " \
+                            "Power=%s,ApparentPower=%s,ReactivePower=%s,Factor=%s,Voltage=%s,Current=%s,cost=%s,power_rate=%s \n" % \
+                            (plugname, Power, ApparentPower, ReactivePower, Factor, Voltage, Current, cost, power_rate)
+            return influx_upload
         else:
             function_logger.info("got unrecognied or unwanted message:%s" % message)
 
     if topic_tree[0] == "energy":
         if topic_tree[1] == "plugpower":
             influx_upload = proceess_plug_power(topic_tree[2], topic_tree[3], msg.payload.decode('utf-8'))
+            function_logger.info(influx_upload)
             update_influx(influx_upload)
     else:
         function_logger.info("got unrecognied or unwanted message topic:%s message:%s" % (msg.topic, str(msg.payload)))
