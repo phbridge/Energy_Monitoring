@@ -196,8 +196,9 @@ def on_message(client, userdata, msg):
             ReactivePower = SENSOR_json["ENERGY"]["ReactivePower"]
             if not HOSTS_DB["LocalBytes_plugs"][plugname].get("last_power"):
                 HOSTS_DB["LocalBytes_plugs"][plugname]["last_power"] = SENSOR_json["ENERGY"]["Total"]
-            difference_in_power = SENSOR_json["ENERGY"]["Total"] - HOSTS_DB["LocalBytes_plugs"][plugname][
-                "last_power"]
+            difference_in_power = SENSOR_json["ENERGY"]["Total"] - HOSTS_DB["LocalBytes_plugs"][plugname]["last_power"]
+            if difference_in_power < 0:
+                difference_in_power = 0
             if not HOSTS_DB["LocalBytes_plugs"][plugname].get("last_power_time"):
                 HOSTS_DB["LocalBytes_plugs"][plugname]["last_power_time"] = time_slot
             difference_in_time = (time_slot - HOSTS_DB["LocalBytes_plugs"][plugname]["last_power_time"]).seconds
