@@ -256,7 +256,6 @@ def master_local_bytes_plugs():
         return
 
 
-
 def graceful_killer(signal_number, frame):
     function_logger = logger.getChild("%s.%s.%s" % (inspect.stack()[2][3], inspect.stack()[1][3], inspect.stack()[0][3]))
     function_logger.info("Got Kill signal")
