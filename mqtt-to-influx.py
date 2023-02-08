@@ -221,7 +221,7 @@ def on_message(client, userdata, msg):
     if topic_tree[0] == "energy":
         if topic_tree[1] == "plugpower":
             influx_upload = proceess_plug_power(topic_tree[2], topic_tree[3], msg.payload.decode('utf-8'))
-            function_logger.info(influx_upload)
+            function_logger.debug(influx_upload)
             update_influx(influx_upload)
     else:
         function_logger.info("got unrecognied or unwanted message topic:%s message:%s" % (msg.topic, str(msg.payload)))
