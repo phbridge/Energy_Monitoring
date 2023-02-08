@@ -280,6 +280,9 @@ if __name__ == '__main__':
     ## MQTT logic - Register callbacks and start MQTT client
     mqttc.on_connect = on_connect
     mqttc.on_message = on_message
-    mqttc.loop_forever()
+
+    while not THREAD_TO_BREAK.is_set():
+        mqttc.loop()
+    quit()
 
 
