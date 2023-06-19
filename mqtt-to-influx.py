@@ -75,7 +75,16 @@ def update_influx(raw_string, timestamp=None):
                     function_logger.debug("update_influx - String was:" + str(string_to_upload).splitlines()[0])
                     function_logger.debug("update_influx - TRACEBACK=" + str(traceback.format_exc()))
                     attempt_error_array.append(str(sys.exc_info()[0]))
+                except requests.exceptions.ReadTimeout as e:
+                    attempts += 1
+                    function_logger.debug("update_influx - attempted " + str(attempts) + " Failed Read Timeout")
+                    function_logger.debug("update_influx - Unexpected error:" + str(sys.exc_info()[0]))
+                    function_logger.debug("update_influx - Unexpected error:" + str(e))
+                    function_logger.debug("update_influx - String was:" + str(string_to_upload).splitlines()[0])
+                    function_logger.debug("update_influx - TRACEBACK=" + str(traceback.format_exc()))
+                    attempt_error_array.append(str(sys.exc_info()[0]))
                 except Exception as e:
+                    attempts += 1
                     function_logger.error("update_influx - attempted " + str(attempts) + " Failed")
                     function_logger.error("update_influx - Unexpected error:" + str(sys.exc_info()[0]))
                     function_logger.error("update_influx - Unexpected error:" + str(e))
@@ -221,7 +230,10 @@ def on_message(client, userdata, msg):
         if topic_tree[1] == "plugpower":
             influx_upload = proceess_plug_power(topic_tree[2], topic_tree[3], msg.payload.decode('utf-8'))
             function_logger.debug(influx_upload)
-            update_influx(influx_upload)
+            if update_influx(influx_upload):
+                function_logger.debug(influx_upload)
+            else:
+                function_logger.error("influx upload failed")
     else:
         function_logger.info("got unrecognied or unwanted message topic:%s message:%s" % (msg.topic, str(msg.payload)))
 
