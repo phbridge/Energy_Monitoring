@@ -225,7 +225,7 @@ def on_message(client, userdata, msg):
                              (plugname, UptimeSec, Heap)
             return influx_upload
         else:
-            function_logger.info("got unrecognied or unwanted PLUG message:%s" % message)
+            function_logger.info("got unrecognied or unwanted PLUG message:%s from:%s" % (message, plugname) )
     if topic_tree[0] == "energy":
         if topic_tree[1] == "plugpower":
             influx_upload = proceess_plug_power(topic_tree[2], topic_tree[3], msg.payload.decode('utf-8'))
