@@ -225,18 +225,40 @@ def on_message(client, userdata, msg):
                              (plugname, UptimeSec, Heap)
             return influx_upload
         else:
-            function_logger.info("got unrecognied or unwanted PLUG message:%s from:%s" % (message, plugname) )
-    if topic_tree[0] == "energy":
-        if topic_tree[1] == "plugpower":
-            influx_upload = proceess_plug_power(topic_tree[2], topic_tree[3], msg.payload.decode('utf-8'))
-            function_logger.debug(influx_upload)
-            if update_influx(influx_upload):
-                function_logger.debug(influx_upload)
-            else:
-                function_logger.error("influx upload failed")
-    else:
-        function_logger.info("got unrecognied or unwanted message topic:%s message:%s" % (msg.topic, str(msg.payload)))
+            function_logger.info("got unrecognied or unwanted PLUG message:%s topic:%s from:%s" % (message, str(topic_tree), plugname))
 
+    try:
+        if topic_tree[0] == "energy":  # this will likly go plug when topics updated
+            if topic_tree[1] == "plugpower":
+                influx_upload = proceess_plug_power(topic_tree[2], topic_tree[3], msg.payload.decode('utf-8'))
+                function_logger.debug(influx_upload)
+                if update_influx(influx_upload):
+                    function_logger.debug(influx_upload)
+                else:
+                    function_logger.error("influx upload failed")
+        elif topic_tree[0] == "tele":
+            if topic_tree[1] in HOSTS_DB["LocalBytes_plugs"].keys():
+                influx_upload = proceess_plug_power(plugname=topic_tree[2], message_type=topic_tree[3], message=msg.payload.decode('utf-8'))
+                function_logger.debug(influx_upload)
+                if update_influx(influx_upload):
+                    function_logger.debug(influx_upload)
+                else:
+                    function_logger.error("influx upload failed")
+            else:
+                function_logger.warning("got message from unauthorised topic:%s message:%s" % (msg.topic, str(msg.payload)))
+        else:
+            function_logger.info("got unrecognied or unwanted message topic:%s message:%s" % (msg.topic, str(msg.payload)))
+    except IndexError as e:
+        function_logger.error("IndexError recieving message")
+        function_logger.error("IndexError recieving message topic:%s message:%s" % (msg.topic, str(msg.payload)))
+        function_logger.error("Unexpected error:" + str(sys.exc_info()[0]))
+        function_logger.error("Unexpected error:" + str(e))
+        function_logger.error("TRACEBACK=" + str(traceback.format_exc()))
+    except Exception as e:
+        function_logger.error("something went bad recieving message")
+        function_logger.error("Unexpected error:" + str(sys.exc_info()[0]))
+        function_logger.error("Unexpected error:" + str(e))
+        function_logger.error("TRACEBACK=" + str(traceback.format_exc()))
 
 def graceful_killer(signal_number, frame):
     function_logger = logger.getChild("%s.%s.%s" % (inspect.stack()[2][3], inspect.stack()[1][3], inspect.stack()[0][3]))
