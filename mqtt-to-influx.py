@@ -232,18 +232,18 @@ def on_message(client, userdata, msg):
             if topic_tree[1] == "plugpower":
                 influx_upload = proceess_plug_power(topic_tree[2], topic_tree[3], msg.payload.decode('utf-8'))
                 function_logger.debug(influx_upload)
-                # if update_influx(influx_upload):
-                #     function_logger.debug(influx_upload)
-                # else:
-                #     function_logger.error("influx upload failed")
+                if update_influx(influx_upload):
+                    function_logger.debug(influx_upload)
+                else:
+                    function_logger.error("influx upload failed")
         elif topic_tree[0] == "tele":
             if topic_tree[1] in HOSTS_DB["LocalBytes_plugs"].keys():
                 influx_upload = proceess_plug_power(plugname=topic_tree[1], message_type=topic_tree[2], message=msg.payload.decode('utf-8'))
                 function_logger.debug(influx_upload)
-                # if update_influx(influx_upload):
-                #     function_logger.debug(influx_upload)
-                # else:
-                #     function_logger.error("influx upload failed")
+                if update_influx(influx_upload):
+                    function_logger.debug(influx_upload)
+                else:
+                    function_logger.error("influx upload failed")
             else:
                 function_logger.warning("got message from unauthorised topic:%s message:%s" % (msg.topic, str(msg.payload)))
         else:
