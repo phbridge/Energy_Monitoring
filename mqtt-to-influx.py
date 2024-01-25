@@ -157,16 +157,22 @@ def on_message(client, userdata, msg):
             HOSTS_DB["DysonFans"][serial]["noxl"] = json_message["data"]["noxl"]
             HOSTS_DB["DysonFans"][serial]["p25r"] = json_message["data"]["p25r"]
             HOSTS_DB["DysonFans"][serial]["p10r"] = json_message["data"]["p10r"]
+            HOSTS_DB["DysonFans"][serial]["aqi"] = HOSTS_DB["DysonFans"][serial]["pm25"] \
+                                                   + HOSTS_DB["DysonFans"][serial]["pm10"] \
+                                                   + HOSTS_DB["DysonFans"][serial]["va10"] \
+                                                   + HOSTS_DB["DysonFans"][serial]["noxl"]
             string = "AirQuality,fan=%s,serial=%s " \
                      "temp=%s,humidity=%s," \
                      "pm25=%s,pm10=%s," \
                      "voc=%s,nox=%s," \
-                     "p25r=%s,p10r=%s" % \
+                     "p25r=%s,p10r=%s," \
+                     "aqi=%s" % \
                      (HOSTS_DB["DysonFans"][serial]["name"], serial,
-                      str(round((int(json_message["data"]["tact"])/10) - 273.15, 2)), json_message["data"]["hact"],
-                      json_message["data"]["pm25"], json_message["data"]["pm10"],
-                      json_message["data"]["va10"], json_message["data"]["noxl"],
-                      json_message["data"]["p25r"], json_message["data"]["p10r"])
+                      HOSTS_DB["DysonFans"][serial]["tact"], HOSTS_DB["DysonFans"][serial]["hact"],
+                      HOSTS_DB["DysonFans"][serial]["pm25"], HOSTS_DB["DysonFans"][serial]["pm10"],
+                      HOSTS_DB["DysonFans"][serial]["va10"], HOSTS_DB["DysonFans"][serial]["noxl"],
+                      HOSTS_DB["DysonFans"][serial]["p25r"], HOSTS_DB["DysonFans"][serial]["p10r"],
+                      HOSTS_DB["DysonFans"][serial]["aqi"])
             return string
         elif json_message["msg"] == "CURRENT-STATE":
             string = "FanPower,fan=%s,serial=%s " \
@@ -337,7 +343,7 @@ def graceful_killer(signal_number, frame):
 
 def request_fan_data_thread():
     function_logger = logger.getChild("%s.%s" % (inspect.stack()[1][3], inspect.stack()[0][3]))
-    function_logger.debug("starting equest_fan_data_thread")
+    function_logger.debug("starting request_fan_data_thread")
 
     def _mqtt_time():
         """Return current time string for mqtt messages."""
