@@ -149,14 +149,14 @@ def on_message(client, userdata, msg):
                              }
         function_logger.debug(json_message)
         if json_message["msg"] == "ENVIRONMENTAL-CURRENT-SENSOR-DATA":
-            print(json_message)
-            print(json_message["msg"])
-            print(json_message["msg"]["data"])
-            print(json_message["msg"]["data"]["tact"])
-            print(int(json_message["msg"]["data"]["tact"]))
-            print(int(json_message["msg"]["data"]["tact"]) - 273.15)
-            print(round(int(json_message["msg"]["data"]["tact"]) - 273.15, 2))
-            print(str(round(int(json_message["msg"]["data"]["tact"]) - 273.15, 2)))
+            function_logger.critical(json_message)
+            function_logger.critical(json_message["msg"])
+            function_logger.critical(json_message["msg"]["data"])
+            function_logger.critical(json_message["msg"]["data"]["tact"])
+            function_logger.critical(int(json_message["msg"]["data"]["tact"]))
+            function_logger.critical(int(json_message["msg"]["data"]["tact"]) - 273.15)
+            function_logger.critical(round(int(json_message["msg"]["data"]["tact"]) - 273.15, 2))
+            function_logger.critical(str(round(int(json_message["msg"]["data"]["tact"]) - 273.15, 2)))
             string = "AirQuality,fan=%s,serial=%s " \
                      "temp=%s,humidity=%s," \
                      "pm25=%s,pm10=%s," \
