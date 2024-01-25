@@ -128,8 +128,8 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     function_logger = logger.getChild("%s.%s.%s" % (inspect.stack()[2][3], inspect.stack()[1][3], inspect.stack()[0][3]))
-    # print(msg.topic + " " + str(msg.payload))
-    # print(msg.topic + " " + str(bytes(msg.payload)))
+    function_logger.debug(msg.topic + " " + str(msg.payload))
+    function_logger.debug(msg.topic + " " + str(bytes(msg.payload)))
     topic_tree = str(msg.topic).split("/")
     time_slot = datetime.datetime.now()
 
@@ -147,8 +147,7 @@ def on_message(client, userdata, msg):
                              9: 37.0,
                              10: 46.2
                              }
-        # print(PRICE_KWH)
-        print(json_message)
+        function_logger.debug(json_message)
         if json_message["msg"] == "ENVIRONMENTAL-CURRENT-SENSOR-DATA":
             string = "AirQuality,fan=%s,serial=%s " \
                      "temp=%s,humidity=%s," \
@@ -160,7 +159,7 @@ def on_message(client, userdata, msg):
                       json_message["msg"]["data"]["pm25"], json_message["msg"]["data"]["pm10"],
                       json_message["msg"]["data"]["va10"], json_message["msg"]["data"]["noxl"],
                       json_message["msg"]["data"]["p25r"], json_message["msg"]["data"]["p10r"])
-            print(string)
+            function_logger.info(string)
         elif json_message["msg"] == "CURRENT-STATE":
             string = "FanPower,fan=%s,serial=%s " \
                      "fanspeed=%s,fanpower=%s," \
@@ -169,7 +168,7 @@ def on_message(client, userdata, msg):
                       json_message["msg"]["product-state"]["fnsp"], fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]],
                       str(fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]] * (PRICE_KWH/1000))
                       )
-            print(string)
+            function_logger.info(string)
 
         elif json_message["msg"] == "STATE-CHANGE":
             string = "FanPower,fan=%s,serial=%s " \
@@ -180,8 +179,7 @@ def on_message(client, userdata, msg):
                       fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]],
                       str(fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]] * (PRICE_KWH / 1000))
                       )
-            print(string)
-            print(json_message)
+            function_logger.debug(string)
 
     def _process_plug_power(plugname, message_type, message):
         if message_type == "STATE":
