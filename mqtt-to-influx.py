@@ -179,16 +179,20 @@ def on_message(client, userdata, msg):
                       str(fan_speed_mapping[json_message["product-state"]["fnsp"]] * (PRICE_KWH/1000))
                       )
             return string
-        elif json_message["msg"] == "STATE-CHANGE":
-            string = "FanPower,fan=%s,serial=%s " \
-                     "fanspeed=%s,fanpower=%s," \
-                     "cost=%s" % \
-                     (HOSTS_DB["DysonFans"][serial]["name"], serial,
-                      json_message["product-state"]["fnsp"],
-                      fan_speed_mapping[json_message["product-state"]["fnsp"]],
-                      str(fan_speed_mapping[json_message["product-state"]["fnsp"]] * (PRICE_KWH / 1000))
-                      )
-            return string
+        # elif json_message["msg"] == "STATE-CHANGE":
+        #     string = "FanPower,fan=%s,serial=%s " \
+        #              "fanspeed=%s,fanpower=%s," \
+        #              "cost=%s" % \
+        #              (HOSTS_DB["DysonFans"][serial]["name"], serial,
+        #               json_message["product-state"]["fnsp"],
+        #               fan_speed_mapping[json_message["product-state"]["fnsp"][]],
+        #               str(fan_speed_mapping[json_message["product-state"]["fnsp"]] * (PRICE_KWH / 1000))
+        #               )
+        #     return string
+        else:
+            function_logger.info("not implemented for %s type message:%s" % (json_message["msg"], json_message))
+            return ""
+
 
     def _process_plug_power(plugname, message_type, message):
         if message_type == "STATE":
