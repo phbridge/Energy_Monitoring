@@ -298,13 +298,14 @@ def on_message(client, userdata, msg):
                 function_logger.warning("got message from unauthorised plug topic:%s message:%s" % (msg.topic, str(msg.payload)))
         elif topic_tree[0] == "438":
             if topic_tree[1] in HOSTS_DB["DysonFans"].keys():
-                if topic_tree[2] == "current":
-                    influx_upload = _process_fan_data(serial=topic_tree[1], message=msg.payload.decode('utf-8'))
-                    function_logger.info(influx_upload)
-                    if update_influx(influx_upload):
-                        function_logger.debug(influx_upload)
-                    else:
-                        function_logger.error("influx upload failed")
+                if topic_tree[2] == "status":
+                    if topic_tree[3] == "current":
+                        influx_upload = _process_fan_data(serial=topic_tree[1], message=msg.payload.decode('utf-8'))
+                        function_logger.info(influx_upload)
+                        if update_influx(influx_upload):
+                            function_logger.debug(influx_upload)
+                        else:
+                            function_logger.error("influx upload failed")
             else:
                 function_logger.warning("got message from unauthorised Fan topic:%s message:%s" % (msg.topic, str(msg.payload)))
         else:
