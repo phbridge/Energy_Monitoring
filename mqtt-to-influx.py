@@ -159,7 +159,7 @@ def on_message(client, userdata, msg):
                       json_message["msg"]["data"]["pm25"], json_message["msg"]["data"]["pm10"],
                       json_message["msg"]["data"]["va10"], json_message["msg"]["data"]["noxl"],
                       json_message["msg"]["data"]["p25r"], json_message["msg"]["data"]["p10r"])
-            function_logger.info(string)
+            return string
         elif json_message["msg"] == "CURRENT-STATE":
             string = "FanPower,fan=%s,serial=%s " \
                      "fanspeed=%s,fanpower=%s," \
@@ -168,8 +168,7 @@ def on_message(client, userdata, msg):
                       json_message["msg"]["product-state"]["fnsp"], fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]],
                       str(fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]] * (PRICE_KWH/1000))
                       )
-            function_logger.info(string)
-
+            return string
         elif json_message["msg"] == "STATE-CHANGE":
             string = "FanPower,fan=%s,serial=%s " \
                      "fanspeed=%s,fanpower=%s," \
@@ -179,7 +178,7 @@ def on_message(client, userdata, msg):
                       fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]],
                       str(fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]] * (PRICE_KWH / 1000))
                       )
-            function_logger.debug(string)
+            return string
 
     def _process_plug_power(plugname, message_type, message):
         if message_type == "STATE":
@@ -322,6 +321,7 @@ def on_message(client, userdata, msg):
         function_logger.error("Unexpected error:" + str(e))
         function_logger.error("TRACEBACK=" + str(traceback.format_exc()))
 
+
 def graceful_killer(signal_number, frame):
     function_logger = logger.getChild("%s.%s.%s" % (inspect.stack()[2][3], inspect.stack()[1][3], inspect.stack()[0][3]))
     function_logger.info("Got Kill signal")
@@ -394,7 +394,7 @@ if __name__ == '__main__':
     logger.addHandler(logger_handler)
     logger.setLevel(logging.INFO)
     logger.info("---------------------- STARTING ----------------------")
-    logger.info("__main__ - " + "Python Monitor Logger")
+    logger.info("__main__ - " + "Python Energy Monitor Logger")
 
     # Catch SIGTERM etc
     signal.signal(signal.SIGHUP, graceful_killer)
@@ -417,6 +417,4 @@ if __name__ == '__main__':
         mqttc.loop()
 
     mqttc.disconnect()
-
-
 
