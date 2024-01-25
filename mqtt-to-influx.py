@@ -135,17 +135,17 @@ def on_message(client, userdata, msg):
 
     def _process_fan_data(serial, message):
         json_message = json.loads(message)
-        fan_speed_mapping = {0: 2.2,
-                             1: 4.8,
-                             2: 5.4,
-                             3: 6.4,
-                             4: 7.0,
-                             5: 10.8,
-                             6: 14.6,
-                             7: 20.3,
-                             8: 27.5,
-                             9: 37.0,
-                             10: 46.2
+        fan_speed_mapping = {"0000": 2.2,
+                             "0001": 4.8,
+                             "0002": 5.4,
+                             "0003": 6.4,
+                             "0004": 7.0,
+                             "0005": 10.8,
+                             "0006": 14.6,
+                             "0007": 20.3,
+                             "0008": 27.5,
+                             "0009": 37.0,
+                             "0010": 46.2
                              }
         function_logger.debug(json_message)
         if json_message["msg"] == "ENVIRONMENTAL-CURRENT-SENSOR-DATA":
@@ -155,7 +155,7 @@ def on_message(client, userdata, msg):
                      "voc=%s,nox=%s," \
                      "p25r=%s,p10r=%s" % \
                      (HOSTS_DB["DysonFans"][serial]["name"], serial,
-                      str(round(int(json_message["data"]["tact"]) - 273.15, 2)), json_message["data"]["hact"],
+                      str(round((int(json_message["data"]["tact"])/10) - 273.15, 2)), json_message["data"]["hact"],
                       json_message["data"]["pm25"], json_message["data"]["pm10"],
                       json_message["data"]["va10"], json_message["data"]["noxl"],
                       json_message["data"]["p25r"], json_message["data"]["p10r"])
