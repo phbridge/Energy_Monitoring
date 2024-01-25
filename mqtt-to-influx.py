@@ -149,7 +149,6 @@ def on_message(client, userdata, msg):
                              }
         function_logger.debug(json_message)
         if json_message["msg"] == "ENVIRONMENTAL-CURRENT-SENSOR-DATA":
-            global HOSTS_DB
             HOSTS_DB["DysonFans"][serial]["tact"] = str(round((int(json_message["data"]["tact"])/10) - 273.15, 2))
             HOSTS_DB["DysonFans"][serial]["hact"] = json_message["data"]["hact"]
             HOSTS_DB["DysonFans"][serial]["pm25"] = json_message["data"]["pm25"]
@@ -373,7 +372,6 @@ def request_fan_data_thread():
             function_logger.critical("%s - %s - %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["current_speed"], future_speed))
         except IndexError:
             function_logger.critical("no data yet for fan writing zero")
-            global HOSTS_DB
             HOSTS_DB["DysonFans"][serial]["tact"] = 0
             HOSTS_DB["DysonFans"][serial]["hact"] = 0
             HOSTS_DB["DysonFans"][serial]["pm25"] = 0
