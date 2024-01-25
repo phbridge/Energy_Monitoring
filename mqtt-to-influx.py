@@ -167,8 +167,6 @@ def on_message(client, userdata, msg):
                       json_message["data"]["pm25"], json_message["data"]["pm10"],
                       json_message["data"]["va10"], json_message["data"]["noxl"],
                       json_message["data"]["p25r"], json_message["data"]["p10r"])
-
-
             return string
         elif json_message["msg"] == "CURRENT-STATE":
             string = "FanPower,fan=%s,serial=%s " \
@@ -179,16 +177,7 @@ def on_message(client, userdata, msg):
                       str(fan_speed_mapping[json_message["product-state"]["fnsp"]] * (PRICE_KWH/1000))
                       )
             return string
-        # elif json_message["msg"] == "STATE-CHANGE":
-        #     string = "FanPower,fan=%s,serial=%s " \
-        #              "fanspeed=%s,fanpower=%s," \
-        #              "cost=%s" % \
-        #              (HOSTS_DB["DysonFans"][serial]["name"], serial,
-        #               json_message["product-state"]["fnsp"],
-        #               fan_speed_mapping[json_message["product-state"]["fnsp"][]],
-        #               str(fan_speed_mapping[json_message["product-state"]["fnsp"]] * (PRICE_KWH / 1000))
-        #               )
-        #     return string
+
         else:
             function_logger.info("not implemented for %s type message:%s" % (json_message["msg"], json_message))
             return ""
@@ -355,35 +344,35 @@ def request_fan_data_thread():
         return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
     def _request_fan_data(serial):
-        try:
-            future_speed = 0
-            if HOSTS_DB["DysonFans"][serial]["pm25"] > 250.5 or HOSTS_DB["DysonFans"][serial]["pm10"] > 420.5 or HOSTS_DB["DysonFans"][serial]["va10"] > 8.5 or HOSTS_DB["DysonFans"][serial]["noxl"] > 8.5:
-                future_speed = 9  # this is the "RED" level for most
-            elif HOSTS_DB["DysonFans"][serial]["pm25"] > 150.5 or HOSTS_DB["DysonFans"][serial]["pm10"] > 350.5:
-                future_speed += 4
-            elif HOSTS_DB["DysonFans"][serial]["pm25"] > 70.5 or HOSTS_DB["DysonFans"][serial]["pm10"] > 100.5:
-                future_speed += 3
-            elif HOSTS_DB["DysonFans"][serial]["pm25"] > 53.5 or HOSTS_DB["DysonFans"][serial]["pm10"] > 75.5 or HOSTS_DB["DysonFans"][serial]["va10"] > 6.5 or HOSTS_DB["DysonFans"][serial]["noxl"] > 6.5:
-                future_speed += 2 # this is the "ORANGE" level for most
-            elif HOSTS_DB["DysonFans"][serial]["pm25"] > 35.5 or HOSTS_DB["DysonFans"][serial]["pm10"] > 50.5 or HOSTS_DB["DysonFans"][serial]["va10"] > 3.5 or HOSTS_DB["DysonFans"][serial]["noxl"] > 3.5:
-                future_speed += 1  # this is the "YELLOW" level for most
-            else:
-                future_speed = 1  # this is the "GREEN" level for most
-
-            if not HOSTS_DB["DysonFans"][serial]["current_speed"] == future_speed:
-                HOSTS_DB["DysonFans"][serial]["device_object"].set_speed = future_speed
-
-            function_logger.critical("%s - %s - %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["current_speed"], future_speed))
-        except IndexError:
-            function_logger.critical("no data yet for fan writing zero")
-            HOSTS_DB["DysonFans"][serial]["tact"] = 0
-            HOSTS_DB["DysonFans"][serial]["hact"] = 0
-            HOSTS_DB["DysonFans"][serial]["pm25"] = 0
-            HOSTS_DB["DysonFans"][serial]["pm10"] = 0
-            HOSTS_DB["DysonFans"][serial]["va10"] = 0
-            HOSTS_DB["DysonFans"][serial]["noxl"] = 0
-            HOSTS_DB["DysonFans"][serial]["p25r"] = 0
-            HOSTS_DB["DysonFans"][serial]["p10r"] = 0
+        # try:
+        #     future_speed = 0
+        #     if HOSTS_DB["DysonFans"][serial]["pm25"] > 250.5 or HOSTS_DB["DysonFans"][serial]["pm10"] > 420.5 or HOSTS_DB["DysonFans"][serial]["va10"] > 8.5 or HOSTS_DB["DysonFans"][serial]["noxl"] > 8.5:
+        #         future_speed = 9  # this is the "RED" level for most
+        #     elif HOSTS_DB["DysonFans"][serial]["pm25"] > 150.5 or HOSTS_DB["DysonFans"][serial]["pm10"] > 350.5:
+        #         future_speed += 4
+        #     elif HOSTS_DB["DysonFans"][serial]["pm25"] > 70.5 or HOSTS_DB["DysonFans"][serial]["pm10"] > 100.5:
+        #         future_speed += 3
+        #     elif HOSTS_DB["DysonFans"][serial]["pm25"] > 53.5 or HOSTS_DB["DysonFans"][serial]["pm10"] > 75.5 or HOSTS_DB["DysonFans"][serial]["va10"] > 6.5 or HOSTS_DB["DysonFans"][serial]["noxl"] > 6.5:
+        #         future_speed += 2 # this is the "ORANGE" level for most
+        #     elif HOSTS_DB["DysonFans"][serial]["pm25"] > 35.5 or HOSTS_DB["DysonFans"][serial]["pm10"] > 50.5 or HOSTS_DB["DysonFans"][serial]["va10"] > 3.5 or HOSTS_DB["DysonFans"][serial]["noxl"] > 3.5:
+        #         future_speed += 1  # this is the "YELLOW" level for most
+        #     else:
+        #         future_speed = 1  # this is the "GREEN" level for most
+        #
+        #     if not HOSTS_DB["DysonFans"][serial]["current_speed"] == future_speed:
+        #         HOSTS_DB["DysonFans"][serial]["device_object"].set_speed = future_speed
+        #
+        #     function_logger.critical("%s - %s - %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["current_speed"], future_speed))
+        # except IndexError:
+        #     function_logger.critical("no data yet for fan writing zero")
+        #     HOSTS_DB["DysonFans"][serial]["tact"] = 0
+        #     HOSTS_DB["DysonFans"][serial]["hact"] = 0
+        #     HOSTS_DB["DysonFans"][serial]["pm25"] = 0
+        #     HOSTS_DB["DysonFans"][serial]["pm10"] = 0
+        #     HOSTS_DB["DysonFans"][serial]["va10"] = 0
+        #     HOSTS_DB["DysonFans"][serial]["noxl"] = 0
+        #     HOSTS_DB["DysonFans"][serial]["p25r"] = 0
+        #     HOSTS_DB["DysonFans"][serial]["p10r"] = 0
 
         function_logger.debug("requesting fan data for %s" % serial)
         topic = "438/%s/command" % serial
