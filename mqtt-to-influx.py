@@ -160,7 +160,6 @@ def on_message(client, userdata, msg):
                       json_message["msg"]["data"]["pm25"], json_message["msg"]["data"]["pm10"],
                       json_message["msg"]["data"]["va10"], json_message["msg"]["data"]["noxl"],
                       json_message["msg"]["data"]["p25r"], json_message["msg"]["data"]["p10r"])
-            print(json_message)
             print(string)
         elif json_message["msg"] == "CURRENT-STATE":
             string = "FanPower,fan=%s,serial=%s " \
@@ -171,7 +170,7 @@ def on_message(client, userdata, msg):
                       str(fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]] * (PRICE_KWH/1000))
                       )
             print(string)
-            print(json_message)
+
         elif json_message["msg"] == "STATE-CHANGE":
             string = "FanPower,fan=%s,serial=%s " \
                      "fanspeed=%s,fanpower=%s," \
@@ -302,12 +301,13 @@ def on_message(client, userdata, msg):
                 function_logger.warning("got message from unauthorised plug topic:%s message:%s" % (msg.topic, str(msg.payload)))
         elif topic_tree[0] == "438":
             if topic_tree[1] in HOSTS_DB["DysonFans"].keys():
-                influx_upload = _process_fan_data(serial=topic_tree[1], message=msg.payload.decode('utf-8'))
-                function_logger.debug(influx_upload)
-                if update_influx(influx_upload):
+                if topic_tree[2] == "current":
+                    influx_upload = _process_fan_data(serial=topic_tree[1], message=msg.payload.decode('utf-8'))
                     function_logger.debug(influx_upload)
-                else:
-                    function_logger.error("influx upload failed")
+                    if update_influx(influx_upload):
+                        function_logger.debug(influx_upload)
+                    else:
+                        function_logger.error("influx upload failed")
             else:
                 function_logger.warning("got message from unauthorised Fan topic:%s message:%s" % (msg.topic, str(msg.payload)))
         else:
