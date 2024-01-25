@@ -149,32 +149,24 @@ def on_message(client, userdata, msg):
                              }
         function_logger.debug(json_message)
         if json_message["msg"] == "ENVIRONMENTAL-CURRENT-SENSOR-DATA":
-            function_logger.critical(json_message)
-            function_logger.critical(json_message["msg"])
-            function_logger.critical(json_message["msg"]["data"])
-            function_logger.critical(json_message["msg"]["data"]["tact"])
-            function_logger.critical(int(json_message["msg"]["data"]["tact"]))
-            function_logger.critical(int(json_message["msg"]["data"]["tact"]) - 273.15)
-            function_logger.critical(round(int(json_message["msg"]["data"]["tact"]) - 273.15, 2))
-            function_logger.critical(str(round(int(json_message["msg"]["data"]["tact"]) - 273.15, 2)))
             string = "AirQuality,fan=%s,serial=%s " \
                      "temp=%s,humidity=%s," \
                      "pm25=%s,pm10=%s," \
                      "voc=%s,nox=%s," \
                      "p25r=%s,p10r=%s" % \
                      (HOSTS_DB["DysonFans"][serial]["name"], serial,
-                      str(round(int(json_message["msg"]["data"]["tact"]) - 273.15, 2)), json_message["msg"]["data"]["hact"],
-                      json_message["msg"]["data"]["pm25"], json_message["msg"]["data"]["pm10"],
-                      json_message["msg"]["data"]["va10"], json_message["msg"]["data"]["noxl"],
-                      json_message["msg"]["data"]["p25r"], json_message["msg"]["data"]["p10r"])
+                      str(round(int(json_message["data"]["tact"]) - 273.15, 2)), json_message["data"]["hact"],
+                      json_message["data"]["pm25"], json_message["data"]["pm10"],
+                      json_message["data"]["va10"], json_message["data"]["noxl"],
+                      json_message["data"]["p25r"], json_message["data"]["p10r"])
             return string
         elif json_message["msg"] == "CURRENT-STATE":
             string = "FanPower,fan=%s,serial=%s " \
                      "fanspeed=%s,fanpower=%s," \
                      "cost=%s" % \
                      (HOSTS_DB["DysonFans"][serial]["name"], serial,
-                      json_message["msg"]["product-state"]["fnsp"], fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]],
-                      str(fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]] * (PRICE_KWH/1000))
+                      json_message["product-state"]["fnsp"], fan_speed_mapping[json_message["product-state"]["fnsp"]],
+                      str(fan_speed_mapping[json_message["product-state"]["fnsp"]] * (PRICE_KWH/1000))
                       )
             return string
         elif json_message["msg"] == "STATE-CHANGE":
@@ -182,9 +174,9 @@ def on_message(client, userdata, msg):
                      "fanspeed=%s,fanpower=%s," \
                      "cost=%s" % \
                      (HOSTS_DB["DysonFans"][serial]["name"], serial,
-                      json_message["msg"]["product-state"]["fnsp"],
-                      fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]],
-                      str(fan_speed_mapping[json_message["msg"]["product-state"]["fnsp"]] * (PRICE_KWH / 1000))
+                      json_message["product-state"]["fnsp"],
+                      fan_speed_mapping[json_message["product-state"]["fnsp"]],
+                      str(fan_speed_mapping[json_message["product-state"]["fnsp"]] * (PRICE_KWH / 1000))
                       )
             return string
 
