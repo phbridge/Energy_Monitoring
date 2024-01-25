@@ -301,7 +301,7 @@ def on_message(client, userdata, msg):
             if topic_tree[1] in HOSTS_DB["DysonFans"].keys():
                 if topic_tree[2] == "current":
                     influx_upload = _process_fan_data(serial=topic_tree[1], message=msg.payload.decode('utf-8'))
-                    function_logger.debug(influx_upload)
+                    function_logger.info(influx_upload)
                     if update_influx(influx_upload):
                         function_logger.debug(influx_upload)
                     else:
