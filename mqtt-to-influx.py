@@ -375,12 +375,14 @@ def request_fan_data_thread():
                         "msg": "STATE-SET",
                         "time": _mqtt_time(),
                         "mode-reason": "LAPP",
-                        "data": "fnsp=%s" % f"{future_speed:04d}"
+                        "data": {
+                            "fnsp": f"{future_speed:04d}"
+                        }
                     }
                 )
                 mqttc.publish(topic=topic, payload=json.dumps(payload))
                 function_logger.critical("setting fan speed for %s to %s" % (HOSTS_DB["DysonFans"][serial]["name"], future_speed))
-
+                function_logger.critical(payload)
             function_logger.critical("%s - %s - %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["current_speed"], future_speed))
         except KeyError:
             function_logger.critical("no data yet for fan writing zero")
