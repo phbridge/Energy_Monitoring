@@ -355,7 +355,7 @@ def request_fan_data_thread():
 
     def _request_fan_data(serial):
         try:
-            function_logger.critical("pm25=%s,pm10=%s,va10=%s,noxl=%s" % (float(HOSTS_DB["DysonFans"][serial]["pm25"]), float(HOSTS_DB["DysonFans"][serial]["pm10"]), float(HOSTS_DB["DysonFans"][serial]["va10"]),  float(HOSTS_DB["DysonFans"][serial]["noxl"])))
+            function_logger.info("%s pm25=%s,pm10=%s,va10=%s,noxl=%s" % (HOSTS_DB["DysonFans"][serial]["name"], float(HOSTS_DB["DysonFans"][serial]["pm25"]), float(HOSTS_DB["DysonFans"][serial]["pm10"]), float(HOSTS_DB["DysonFans"][serial]["va10"]),  float(HOSTS_DB["DysonFans"][serial]["noxl"])))
             future_speed = 0
             if float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 250.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 420.5 or float(HOSTS_DB["DysonFans"][serial]["va10"]) > 80.5 or float(HOSTS_DB["DysonFans"][serial]["noxl"]) > 80.5:
                 future_speed = 10  # this is the "RED" level for most
@@ -371,9 +371,10 @@ def request_fan_data_thread():
                 future_speed = 1  # this is the "GREEN" level for most
 
             if not HOSTS_DB["DysonFans"][serial]["fnsp"] == f"{future_speed:04d}":
+                function_logger.info("%s pm25=%s,pm10=%s,va10=%s,noxl=%s" % (HOSTS_DB["DysonFans"][serial]["name"], float(HOSTS_DB["DysonFans"][serial]["pm25"]), float(HOSTS_DB["DysonFans"][serial]["pm10"]), float(HOSTS_DB["DysonFans"][serial]["va10"]), float(HOSTS_DB["DysonFans"][serial]["noxl"])))
                 if future_speed > 10:
                     future_speed = 10
-                function_logger.critical("setting fan speed for %s from %s to %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["fnsp"], f"{future_speed:04d}"))
+                function_logger.info("setting fan speed for %s from %s to %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["fnsp"], f"{future_speed:04d}"))
                 topic = "438/%s/command" % serial
                 payload = json.dumps(
                     {
@@ -390,8 +391,8 @@ def request_fan_data_thread():
                 )
                 mqttc.publish(topic=topic, payload=json.dumps(payload))
                 # function_logger.critical("setting fan speed for %s to %s" % (HOSTS_DB["DysonFans"][serial]["name"], future_speed))
-                function_logger.critical(payload)
-            function_logger.critical("%s - %s - %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["fnsp"], future_speed))
+                function_logger.info(payload)
+                function_logger.info("%s - %s - %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["fnsp"], future_speed))
         except KeyError as e:
             function_logger.warning("no data yet for fan %s writing zero" % HOSTS_DB["DysonFans"][serial]["name"])
             function_logger.warning("Missing Key:%s" % str(e))
