@@ -374,9 +374,9 @@ def request_fan_data_thread():
                     {
                         "msg": "STATE-SET",
                         "time": _mqtt_time(),
-                        "mode-reason": "LAPP",
+                        # "mode-reason": "LAPP",
                         "data": {
-                            "fnsp": f"{future_speed:04d}"
+                            'fnsp': f'{future_speed:04d}'
                         }
                     }
                 )
@@ -385,7 +385,7 @@ def request_fan_data_thread():
                 function_logger.critical(payload)
             function_logger.critical("%s - %s - %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["current_speed"], future_speed))
         except KeyError:
-            function_logger.critical("no data yet for fan writing zero")
+            function_logger.critical("no data yet for fan %s writing zero" % HOSTS_DB["DysonFans"][serial]["name"])
             HOSTS_DB["DysonFans"][serial]["tact"] = 0
             HOSTS_DB["DysonFans"][serial]["hact"] = 0
             HOSTS_DB["DysonFans"][serial]["pm25"] = 0
