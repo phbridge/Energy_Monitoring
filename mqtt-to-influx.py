@@ -380,6 +380,11 @@ def request_fan_data_thread():
             HOSTS_DB["DysonFans"][serial]["noxl"] = 0
             HOSTS_DB["DysonFans"][serial]["p25r"] = 0
             HOSTS_DB["DysonFans"][serial]["p10r"] = 0
+        except Exception as e:
+            function_logger.error("something went changing fan speed")
+            function_logger.error("Unexpected error:%s" % str(sys.exc_info()[0]))
+            function_logger.error("Unexpected error:%s" % str(e))
+            function_logger.error("TRACEBACK=%s" % str(traceback.format_exc()))
 
         function_logger.debug("requesting fan data for %s" % serial)
         topic = "438/%s/command" % serial
