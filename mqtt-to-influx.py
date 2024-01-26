@@ -175,13 +175,19 @@ def on_message(client, userdata, msg):
                       HOSTS_DB["DysonFans"][serial]["aqi"])
             return string
         elif json_message["msg"] == "CURRENT-STATE":
-            HOSTS_DB["DysonFans"][serial]["fnsp"] = json_message["product-state"]["fnsp"]
+            if json_message["product-state"]['fnst'] == "OFF":
+                HOSTS_DB["DysonFans"][serial]["fnsp"] = "0000"
+            elif json_message["product-state"]['fnst'] == "FAN":
+                HOSTS_DB["DysonFans"][serial]["fnsp"] = json_message["product-state"]["fnsp"]
+            else:
+                HOSTS_DB["DysonFans"][serial]["fnsp"] = "0000"
+                function_logger.critical("fan state not recognised message:%s" % json_message)
             string = "FanPower,fan=%s,serial=%s " \
                      "fanspeed=%s,fanpower=%s," \
                      "cost=%s" % \
                      (HOSTS_DB["DysonFans"][serial]["name"], serial,
-                      json_message["product-state"]["fnsp"], fan_speed_mapping[json_message["product-state"]["fnsp"]],
-                      str(fan_speed_mapping[json_message["product-state"]["fnsp"]] * (PRICE_KWH/1000))
+                      HOSTS_DB["DysonFans"][serial]["fnsp"], fan_speed_mapping[HOSTS_DB["DysonFans"][serial]["fnsp"]],
+                      str(fan_speed_mapping[HOSTS_DB["DysonFans"][serial]["fnsp"]] * (PRICE_KWH/1000))
                       )
             return string
 
@@ -402,7 +408,7 @@ def request_fan_data_thread():
             HOSTS_DB["DysonFans"][serial]["noxl"] = 0
             HOSTS_DB["DysonFans"][serial]["p25r"] = 0
             HOSTS_DB["DysonFans"][serial]["p10r"] = 0
-            HOSTS_DB["DysonFans"][serial]["fnsp"] = 0
+            HOSTS_DB["DysonFans"][serial]["fnsp"] = "0000"
             function_logger.warning(HOSTS_DB["DysonFans"][serial])
         except Exception as e:
             function_logger.error("something went changing fan speed")
