@@ -353,6 +353,7 @@ def request_fan_data_thread():
     def _request_fan_data(serial):
         try:
             function_logger.info("starting _request_fan_data")
+            function_logger.critical("pm25=%s,pm10=%s,va10=%s,noxl=%s" % (float(HOSTS_DB["DysonFans"][serial]["pm25"]), float(HOSTS_DB["DysonFans"][serial]["pm10"]), float(HOSTS_DB["DysonFans"][serial]["va10"]),  float(HOSTS_DB["DysonFans"][serial]["noxl"])))
             future_speed = 0
             if float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 250.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 420.5 or float(HOSTS_DB["DysonFans"][serial]["va10"]) > 8.5 or float(HOSTS_DB["DysonFans"][serial]["noxl"]) > 8.5:
                 future_speed = 10  # this is the "RED" level for most
