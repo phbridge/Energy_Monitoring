@@ -33,8 +33,8 @@ mqttc = mqtt.Client()
 mqttc.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
 mqttc.connect(MQTT_BROKER_URL)
 
-multiprocessing_manager = Manager()
-HOSTS_DB = multiprocessing_manager.dict({})
+# multiprocessing_manager = Manager()
+# HOSTS_DB = multiprocessing_manager.dict({})
 
 def update_influx(raw_string, timestamp=None):
     function_logger = logger.getChild("%s.%s.%s" % (inspect.stack()[2][3], inspect.stack()[1][3], inspect.stack()[0][3]))
@@ -469,8 +469,8 @@ if __name__ == '__main__':
 
     # GET_CURRENT_DB
     logger.info("__main__ - " + "GET_CURRENT_DB")
-    HOSTS_DB.update(load_hosts_file_json())
-    # HOSTS_DB = load_hosts_file_json()
+    # HOSTS_DB.update(load_hosts_file_json())
+    HOSTS_DB = load_hosts_file_json()
     #
 
     ## MQTT logic - Register callbacks and start MQTT client
