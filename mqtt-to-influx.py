@@ -374,7 +374,7 @@ def request_fan_data_thread():
                     {
                         "msg": "STATE-SET",
                         "time": _mqtt_time(),
-                        # "mode-reason": "LAPP",
+                        "mode-reason": "LAPP",
                         "data": {
                             "oson": "OFF",
                             "fnsp": f"{future_speed:04d}",
