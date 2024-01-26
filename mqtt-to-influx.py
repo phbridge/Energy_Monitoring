@@ -382,7 +382,7 @@ def request_fan_data_thread():
                 function_logger.critical("setting fan speed for %s to %s" % (HOSTS_DB["DysonFans"][serial]["name"], future_speed))
 
             function_logger.critical("%s - %s - %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["current_speed"], future_speed))
-        except IndexError:
+        except KeyError:
             function_logger.critical("no data yet for fan writing zero")
             HOSTS_DB["DysonFans"][serial]["tact"] = 0
             HOSTS_DB["DysonFans"][serial]["hact"] = 0
