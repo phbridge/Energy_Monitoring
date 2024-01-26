@@ -150,7 +150,7 @@ def on_message(client, userdata, msg):
                              "0009": 37.0,
                              "0010": 46.2
                              }
-        function_logger.debug(json_message)
+        function_logger.info(json_message)
         if json_message["msg"] == "ENVIRONMENTAL-CURRENT-SENSOR-DATA":
             HOSTS_DB["DysonFans"][serial]["tact"] = str(round((int(json_message["data"]["tact"])/10) - 273.15, 2))
             HOSTS_DB["DysonFans"][serial]["hact"] = json_message["data"]["hact"]
