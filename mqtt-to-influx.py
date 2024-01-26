@@ -15,6 +15,7 @@ import requests
 import time
 # from datetime import timedelta          # calculate x time ago
 # from datetime import datetime           # timestamps mostly
+from multiprocessing import Manager     # variables between processes dict
 
 
 ABSOLUTE_PATH = credentials.ABSOLUTE_PATH
@@ -32,6 +33,8 @@ mqttc = mqtt.Client()
 mqttc.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
 mqttc.connect(MQTT_BROKER_URL)
 
+multiprocessing_manager = Manager()
+HOSTS_DB = multiprocessing_manager.dict({})
 
 def update_influx(raw_string, timestamp=None):
     function_logger = logger.getChild("%s.%s.%s" % (inspect.stack()[2][3], inspect.stack()[1][3], inspect.stack()[0][3]))
@@ -388,7 +391,7 @@ def request_fan_data_thread():
                 function_logger.critical(payload)
             function_logger.critical("%s - %s - %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["current_speed"], future_speed))
         except KeyError:
-            function_logger.critical("no data yet for fan %s writing zero" % HOSTS_DB["DysonFans"][serial]["name"])
+            function_logger.warning("no data yet for fan %s writing zero" % HOSTS_DB["DysonFans"][serial]["name"])
             HOSTS_DB["DysonFans"][serial]["tact"] = 0
             HOSTS_DB["DysonFans"][serial]["hact"] = 0
             HOSTS_DB["DysonFans"][serial]["pm25"] = 0
@@ -466,7 +469,8 @@ if __name__ == '__main__':
 
     # GET_CURRENT_DB
     logger.info("__main__ - " + "GET_CURRENT_DB")
-    HOSTS_DB = load_hosts_file_json()
+    HOSTS_DB.update(load_hosts_file_json())
+    # HOSTS_DB = load_hosts_file_json()
     #
 
     ## MQTT logic - Register callbacks and start MQTT client
