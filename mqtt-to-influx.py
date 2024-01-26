@@ -311,7 +311,7 @@ def on_message(client, userdata, msg):
                 if topic_tree[2] == "status":
                     if topic_tree[3] == "current":
                         influx_upload = _process_fan_data(serial=topic_tree[1], message=msg.payload.decode('utf-8'))
-                        function_logger.info(influx_upload)
+                        function_logger.debug(influx_upload)
                         if update_influx(influx_upload):
                             function_logger.debug(influx_upload)
                         else:
@@ -352,7 +352,6 @@ def request_fan_data_thread():
 
     def _request_fan_data(serial):
         try:
-            function_logger.info("starting _request_fan_data")
             function_logger.critical("pm25=%s,pm10=%s,va10=%s,noxl=%s" % (float(HOSTS_DB["DysonFans"][serial]["pm25"]), float(HOSTS_DB["DysonFans"][serial]["pm10"]), float(HOSTS_DB["DysonFans"][serial]["va10"]),  float(HOSTS_DB["DysonFans"][serial]["noxl"])))
             future_speed = 0
             if float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 250.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 420.5 or float(HOSTS_DB["DysonFans"][serial]["va10"]) > 80.5 or float(HOSTS_DB["DysonFans"][serial]["noxl"]) > 8.5:
