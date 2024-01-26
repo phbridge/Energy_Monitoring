@@ -160,10 +160,7 @@ def on_message(client, userdata, msg):
             HOSTS_DB["DysonFans"][serial]["noxl"] = json_message["data"]["noxl"]
             HOSTS_DB["DysonFans"][serial]["p25r"] = json_message["data"]["p25r"]
             HOSTS_DB["DysonFans"][serial]["p10r"] = json_message["data"]["p10r"]
-            HOSTS_DB["DysonFans"][serial]["aqi"] = HOSTS_DB["DysonFans"][serial]["pm25"] \
-                                                   + HOSTS_DB["DysonFans"][serial]["pm10"] \
-                                                   + HOSTS_DB["DysonFans"][serial]["va10"] \
-                                                   + HOSTS_DB["DysonFans"][serial]["noxl"]
+            HOSTS_DB["DysonFans"][serial]["aqi"] = HOSTS_DB["DysonFans"][serial]["pm25"] + HOSTS_DB["DysonFans"][serial]["pm10"] + HOSTS_DB["DysonFans"][serial]["va10"] + HOSTS_DB["DysonFans"][serial]["noxl"]
             string = "AirQuality,fan=%s,serial=%s " \
                      "temp=%s,humidity=%s," \
                      "pm25=%s,pm10=%s," \
@@ -382,10 +379,10 @@ def request_fan_data_thread():
                         "time": _mqtt_time(),
                         "mode-reason": "LAPP",
                         "data": {
-                            "oson": "OFF",
+                            # "oson": "OFF",
                             "fnsp": f"{future_speed:04d}",
-                            "nmod": "OFF",
-                            "fmod": "FAN"
+                            # "nmod": "OFF",
+                            # "fmod": "FAN"
                         }
                     }
                 )
