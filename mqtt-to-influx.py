@@ -355,15 +355,15 @@ def request_fan_data_thread():
             function_logger.info("starting _request_fan_data")
             function_logger.critical("pm25=%s,pm10=%s,va10=%s,noxl=%s" % (float(HOSTS_DB["DysonFans"][serial]["pm25"]), float(HOSTS_DB["DysonFans"][serial]["pm10"]), float(HOSTS_DB["DysonFans"][serial]["va10"]),  float(HOSTS_DB["DysonFans"][serial]["noxl"])))
             future_speed = 0
-            if float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 250.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 420.5 or float(HOSTS_DB["DysonFans"][serial]["va10"]) > 8.5 or float(HOSTS_DB["DysonFans"][serial]["noxl"]) > 8.5:
+            if float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 250.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 420.5 or float(HOSTS_DB["DysonFans"][serial]["va10"]) > 80.5 or float(HOSTS_DB["DysonFans"][serial]["noxl"]) > 8.5:
                 future_speed = 10  # this is the "RED" level for most
             elif float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 150.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 350.5:
                 future_speed += 4
             elif float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 70.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 100.5:
                 future_speed += 3
-            elif float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 53.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 75.5 or float(HOSTS_DB["DysonFans"][serial]["va10"]) > 6.5 or float(HOSTS_DB["DysonFans"][serial]["noxl"]) > 6.5:
+            elif float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 53.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 75.5 or float(HOSTS_DB["DysonFans"][serial]["va10"]) > 60.5 or float(HOSTS_DB["DysonFans"][serial]["noxl"]) > 6.5:
                 future_speed += 2 # this is the "ORANGE" level for most
-            elif float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 35.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 50.5 or float(HOSTS_DB["DysonFans"][serial]["va10"]) > 3.5 or float(HOSTS_DB["DysonFans"][serial]["noxl"]) > 3.5:
+            elif float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 35.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 50.5 or float(HOSTS_DB["DysonFans"][serial]["va10"]) > 30.5 or float(HOSTS_DB["DysonFans"][serial]["noxl"]) > 3.5:
                 future_speed += 1  # this is the "YELLOW" level for most
             else:
                 future_speed = 1  # this is the "GREEN" level for most
