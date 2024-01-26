@@ -387,12 +387,12 @@ def request_fan_data_thread():
                     }
                 )
                 mqttc.publish(topic=topic, payload=json.dumps(payload))
-                function_logger.critical("setting fan speed for %s to %s" % (HOSTS_DB["DysonFans"][serial]["name"], future_speed))
+                # function_logger.critical("setting fan speed for %s to %s" % (HOSTS_DB["DysonFans"][serial]["name"], future_speed))
                 function_logger.critical(payload)
             function_logger.critical("%s - %s - %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["fnsp"], future_speed))
         except KeyError as e:
             function_logger.warning("no data yet for fan %s writing zero" % HOSTS_DB["DysonFans"][serial]["name"])
-            function_logger.error("Missing Key:%s" % str(e))
+            function_logger.warning("Missing Key:%s" % str(e))
             function_logger.warning(HOSTS_DB["DysonFans"][serial])
             HOSTS_DB["DysonFans"][serial]["tact"] = 0
             HOSTS_DB["DysonFans"][serial]["hact"] = 0
