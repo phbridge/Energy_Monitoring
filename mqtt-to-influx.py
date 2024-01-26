@@ -367,8 +367,8 @@ def request_fan_data_thread():
             else:
                 future_speed = 1  # this is the "GREEN" level for most
 
-            if not HOSTS_DB["DysonFans"][serial]["fnsp"] == future_speed:
-                function_logger.critical("setting fan speed for %s to %s" % (HOSTS_DB["DysonFans"][serial]["name"], future_speed))
+            if not HOSTS_DB["DysonFans"][serial]["fnsp"] == f"{future_speed:04d}":
+                function_logger.critical("setting fan speed for %s from %s to %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["fnsp"], f"{future_speed:04d}"))
                 topic = "438/%s/command" % serial
                 payload = json.dumps(
                     {
