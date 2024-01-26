@@ -354,7 +354,6 @@ def request_fan_data_thread():
         return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
     def _request_fan_data(serial):
-        global HOSTS_DB
         try:
             function_logger.critical("pm25=%s,pm10=%s,va10=%s,noxl=%s" % (float(HOSTS_DB["DysonFans"][serial]["pm25"]), float(HOSTS_DB["DysonFans"][serial]["pm10"]), float(HOSTS_DB["DysonFans"][serial]["va10"]),  float(HOSTS_DB["DysonFans"][serial]["noxl"])))
             future_speed = 0
@@ -394,6 +393,7 @@ def request_fan_data_thread():
         except KeyError as e:
             function_logger.warning("no data yet for fan %s writing zero" % HOSTS_DB["DysonFans"][serial]["name"])
             function_logger.error("Missing Key:%s" % str(e))
+            function_logger.warning(HOSTS_DB["DysonFans"][serial])
             HOSTS_DB["DysonFans"][serial]["tact"] = 0
             HOSTS_DB["DysonFans"][serial]["hact"] = 0
             HOSTS_DB["DysonFans"][serial]["pm25"] = 0
@@ -403,6 +403,7 @@ def request_fan_data_thread():
             HOSTS_DB["DysonFans"][serial]["p25r"] = 0
             HOSTS_DB["DysonFans"][serial]["p10r"] = 0
             HOSTS_DB["DysonFans"][serial]["fnsp"] = 0
+            function_logger.warning(HOSTS_DB["DysonFans"][serial])
         except Exception as e:
             function_logger.error("something went changing fan speed")
             function_logger.error("Unexpected error:%s" % str(sys.exc_info()[0]))
