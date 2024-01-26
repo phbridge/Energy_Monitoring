@@ -175,6 +175,7 @@ def on_message(client, userdata, msg):
                       HOSTS_DB["DysonFans"][serial]["aqi"])
             return string
         elif json_message["msg"] == "CURRENT-STATE":
+            HOSTS_DB["DysonFans"][serial]["fnsp"] = json_message["product-state"]["fnsp"]
             string = "FanPower,fan=%s,serial=%s " \
                      "fanspeed=%s,fanpower=%s," \
                      "cost=%s" % \
@@ -351,10 +352,10 @@ def request_fan_data_thread():
 
     def _request_fan_data(serial):
         try:
-            function_logger.critical("starting _request_fan_data")
+            function_logger.info("starting _request_fan_data")
             future_speed = 0
             if float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 250.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 420.5 or float(HOSTS_DB["DysonFans"][serial]["va10"]) > 8.5 or float(HOSTS_DB["DysonFans"][serial]["noxl"]) > 8.5:
-                future_speed = 9  # this is the "RED" level for most
+                future_speed = 10  # this is the "RED" level for most
             elif float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 150.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 350.5:
                 future_speed += 4
             elif float(HOSTS_DB["DysonFans"][serial]["pm25"]) > 70.5 or float(HOSTS_DB["DysonFans"][serial]["pm10"]) > 100.5:
@@ -365,11 +366,22 @@ def request_fan_data_thread():
                 future_speed += 1  # this is the "YELLOW" level for most
             else:
                 future_speed = 1  # this is the "GREEN" level for most
-        #
-        #     if not HOSTS_DB["DysonFans"][serial]["current_speed"] == future_speed:
-        #         HOSTS_DB["DysonFans"][serial]["device_object"].set_speed = future_speed
-        #
-        #     function_logger.critical("%s - %s - %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["current_speed"], future_speed))
+
+            if not HOSTS_DB["DysonFans"][serial]["fnsp"] == future_speed:
+                function_logger.critical("setting fan speed for %s to %s" % (HOSTS_DB["DysonFans"][serial]["name"], future_speed))
+                topic = "438/%s/command" % serial
+                payload = json.dumps(
+                    {
+                        "msg": "STATE-SET",
+                        "time": _mqtt_time(),
+                        "mode-reason": "LAPP",
+                        "data": "fnsp=%s" % f"{future_speed:04d}"
+                    }
+                )
+                mqttc.publish(topic=topic, payload=json.dumps(payload))
+                function_logger.critical("setting fan speed for %s to %s" % (HOSTS_DB["DysonFans"][serial]["name"], future_speed))
+
+            function_logger.critical("%s - %s - %s" % (HOSTS_DB["DysonFans"][serial]["name"], HOSTS_DB["DysonFans"][serial]["current_speed"], future_speed))
         except IndexError:
             function_logger.critical("no data yet for fan writing zero")
             HOSTS_DB["DysonFans"][serial]["tact"] = 0
@@ -380,6 +392,7 @@ def request_fan_data_thread():
             HOSTS_DB["DysonFans"][serial]["noxl"] = 0
             HOSTS_DB["DysonFans"][serial]["p25r"] = 0
             HOSTS_DB["DysonFans"][serial]["p10r"] = 0
+            HOSTS_DB["DysonFans"][serial]["fnsp"] = 0
         except Exception as e:
             function_logger.error("something went changing fan speed")
             function_logger.error("Unexpected error:%s" % str(sys.exc_info()[0]))
